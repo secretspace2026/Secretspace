@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { supabase } from "./supabaseClient";
 
 // ─── SVG Icons ────────────────────────────────────────────────────────────
 const I = {
@@ -713,8 +714,33 @@ function NewRoomModal({T,onSubmit,onClose}) {
 }
 
 function SignUpModal({T,onSubmit,onClose,setModal}) {
-  const [name,setName]=useState(""); const [pass,setPass]=useState(""); const [show,setShow]=useState(false);
+  const [name,setName]=useState("");
+  const [pass,setPass]=useState("");
+  const [show,setShow]=useState(false);
+  const [loading,setLoading]=useState(false);
+  const [error,setError]=useState("");
   const suggested=useState(genId)[0];
+
+  const handleSignUp = async () => {
+    if(!pass) return;
+    setLoading(true);
+    setError("");
+    const username = name.trim() || suggested;
+    const fakeEmail = `${username.toLowerCase()}@secretspace.app`;
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email: fakeEmail,
+      password: pass,
+    });
+    if(signUpError){ setError(signUpError.message); setLoading(false); return; }
+    const { error: profileError } = await supabase.from("profiles").insert({
+      id: data.user.id,
+      username: username,
+    });
+    if(profileError){ setError("Username taken, try another."); setLoading(false); return; }
+    onSubmit(username);
+    setLoading(false);
+  };
+
   return <>
     <MH T={T} title="Create Account" onClose={onClose}/>
     <div style={{background:T.surface2,border:`1px solid ${T.border}`,borderRadius:8,padding:"10px 13px",marginBottom:12}}>
@@ -722,6 +748,7 @@ function SignUpModal({T,onSubmit,onClose,setModal}) {
       <div style={{fontWeight:600,fontSize:"0.86rem",color:T.text}}>{suggested}</div>
       <div style={{fontSize:"0.68rem",color:T.sub,marginTop:2}}>Auto-generated · Anonymous · No real name needed</div>
     </div>
+    {error && <div style={{background:"#fee",border:"1px solid #fcc",borderRadius:8,padding:"8px 12px",marginBottom:10,fontSize:"0.78rem",color:"#c00"}}>{error}</div>}
     <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:14}}>
       <input value={name} onChange={e=>setName(e.target.value)} placeholder={`Username (default: ${suggested.split("_")[0]})`} style={inp(T)}/>
       <div style={{position:"relative"}}>
@@ -729,21 +756,40 @@ function SignUpModal({T,onSubmit,onClose,setModal}) {
         <button onClick={()=>setShow(s=>!s)} style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:T.sub,display:"flex",padding:2}}>{show?<I.eyeOff/>:<I.eye/>}</button>
       </div>
     </div>
-    <PBtn T={T} label="Create Virtual Account" onClick={()=>(name.trim()||suggested)&&pass&&onSubmit(name.trim()||suggested)} disabled={!pass}/>
+    <PBtn T={T} label={loading?"Creating...":"Create Virtual Account"} onClick={handleSignUp} disabled={!pass||loading}/>
     <p style={{textAlign:"center",fontSize:"0.68rem",color:T.muted,marginTop:8}}>No email required · Fully anonymous</p>
     <p style={{textAlign:"center",fontSize:"0.76rem",color:T.sub,marginTop:6}}>Already have an account? <button onClick={()=>setModal("signin")} style={{background:"none",border:"none",color:T.text,fontWeight:600,cursor:"pointer",textDecoration:"underline",fontSize:"inherit"}}>Sign in</button></p>
   </>;
 }
 
 function SignInModal({T,onSubmit,onClose,setModal}) {
-  const [name,setName]=useState(""); const [pass,setPass]=useState("");
+  const [name,setName]=useState("");
+  const [pass,setPass]=useState("");
+  const [loading,setLoading]=useState(false);
+  const [error,setError]=useState("");
+
+  const handleSignIn = async () => {
+    if(!name.trim()||!pass) return;
+    setLoading(true);
+    setError("");
+    const fakeEmail = `${name.trim().toLowerCase()}@secretspace.app`;
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: fakeEmail,
+      password: pass,
+    });
+    if(signInError){ setError("Wrong username or password."); setLoading(false); return; }
+    onSubmit(name.trim());
+    setLoading(false);
+  };
+
   return <>
     <MH T={T} title="Sign In" onClose={onClose}/>
+    {error && <div style={{background:"#fee",border:"1px solid #fcc",borderRadius:8,padding:"8px 12px",marginBottom:10,fontSize:"0.78rem",color:"#c00"}}>{error}</div>}
     <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:14}}>
       <input value={name} onChange={e=>setName(e.target.value)} placeholder="Your username or Virtual ID" style={inp(T)}/>
       <input value={pass} onChange={e=>setPass(e.target.value)} type="password" placeholder="Password" style={inp(T)}/>
     </div>
-    <PBtn T={T} label="Sign In" onClick={()=>name.trim()&&onSubmit(name.trim())} disabled={!name.trim()}/>
+    <PBtn T={T} label={loading?"Signing in...":"Sign In"} onClick={handleSignIn} disabled={!name.trim()||!pass||loading}/>
     <p style={{textAlign:"center",fontSize:"0.76rem",color:T.sub,marginTop:10}}>No account? <button onClick={()=>setModal("signup")} style={{background:"none",border:"none",color:T.text,fontWeight:600,cursor:"pointer",textDecoration:"underline",fontSize:"inherit"}}>Create one free</button></p>
   </>;
 }
