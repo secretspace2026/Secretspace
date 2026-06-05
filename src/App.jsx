@@ -136,7 +136,7 @@ function globalCss(T, dark) {
     .desktop-right{display:none !important;}
     .desktop-search{display:none !important;}
     .mobile-search-btn{display:flex !important;}
-    .main-pad{padding:14px 14px calc(80px + env(safe-area-inset-bottom)) !important;}
+    .main-pad{padding:14px 16px calc(80px + env(safe-area-inset-bottom)) !important;width:100% !important;min-width:0 !important;overflow-x:hidden !important;}
     .header-h{height:52px !important;}
     .desktop-main-margins{margin-left:0 !important;margin-right:0 !important;}
     .mobile-fab{display:flex !important;}
@@ -157,7 +157,8 @@ function globalCss(T, dark) {
     }
 
     @media(max-width:767px){
-      body{overflow:auto;}
+      html,body{overflow-x:hidden !important;max-width:100vw;}
+      body{overflow-y:auto;}
     }
   `;
 }
@@ -192,58 +193,36 @@ export default function App() {
   ];
 
   return (
-    <div style={{display:"flex",flexDirection:"column",minHeight:"100vh",width:"100%",background:T.bg,color:T.text,fontFamily:"'Sora',sans-serif"}}>
+    <div style={{display:"flex",flexDirection:"column",minHeight:"100vh",width:"100%",maxWidth:"100vw",overflowX:"hidden",background:T.bg,color:T.text,fontFamily:"'Sora',sans-serif"}}>
       <style>{globalCss(T,dark)}</style>
 
       {/* ── Header ── */}
-      <header className="header-h" style={{position:"sticky",top:0,zIndex:50,borderBottom:`1px solid ${T.border}`,background:T.bg,backdropFilter:"blur(18px)",WebkitBackdropFilter:"blur(18px)",display:"flex",alignItems:"center",padding:"0 16px",gap:12,flexShrink:0,position:"relative"}}>
+      <header className="header-h" style={{position:"sticky",top:0,zIndex:50,borderBottom:`1px solid ${T.border}`,background:T.bg,backdropFilter:"blur(18px)",WebkitBackdropFilter:"blur(18px)",display:"flex",alignItems:"center",padding:"0 14px",gap:8,flexShrink:0,width:"100%",maxWidth:"100vw",overflow:"hidden"}}>
 
-        {/* Desktop: wordmark only (no S logo), left side */}
+        {/* ── Desktop: wordmark left ── */}
         <div className="desktop-only" style={{display:"flex",alignItems:"center",gap:9,flexShrink:0}}>
-          <div>
-            <div style={{fontFamily:"'Sora',sans-serif",fontSize:"0.92rem",fontWeight:700,letterSpacing:"-0.02em",color:T.text,lineHeight:1}}>secretspace</div>
-            <div style={{fontSize:"0.48rem",letterSpacing:"0.18em",textTransform:"uppercase",color:T.sub,marginTop:2}}>anonymous network</div>
-          </div>
+          <div style={{fontFamily:"'Sora',sans-serif",fontSize:"0.92rem",fontWeight:700,letterSpacing:"-0.02em",color:T.text,lineHeight:1}}>secretspace</div>
+          <div style={{fontSize:"0.48rem",letterSpacing:"0.18em",textTransform:"uppercase",color:T.sub,marginTop:2,display:"block"}}>anonymous network</div>
         </div>
 
-        {/* Desktop search — centered absolutely */}
+        {/* ── Desktop: search bar centered ── */}
         <div className="desktop-search" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",width:380,display:"flex",alignItems:"center"}}>
-          <div style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",color:T.sub,display:"flex",pointerEvents:"none"}}>
-            <I.search/>
-          </div>
-          <input
-            value={searchVal} onChange={e=>setSearchVal(e.target.value)}
-            placeholder="Search anything..."
-            style={{width:"100%",background:T.surface2,border:`1.5px solid ${T.border2}`,borderRadius:99,padding:"7px 14px 7px 36px",fontSize:"0.8rem",color:T.text,transition:"border-color 0.15s"}}
-          />
-          {searchVal && (
-            <button onClick={()=>setSearchVal("")} className="ib" style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:T.sub,display:"flex",padding:2}}>
-              <I.close/>
-            </button>
-          )}
+          <div style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",color:T.sub,display:"flex",pointerEvents:"none"}}><I.search/></div>
+          <input value={searchVal} onChange={e=>setSearchVal(e.target.value)} placeholder="Search anything..."
+            style={{width:"100%",background:T.surface2,border:`1.5px solid ${T.border2}`,borderRadius:99,padding:"7px 14px 7px 36px",fontSize:"0.8rem",color:T.text,transition:"border-color 0.15s"}}/>
+          {searchVal&&<button onClick={()=>setSearchVal("")} className="ib" style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:T.sub,display:"flex",padding:2}}><I.close/></button>}
         </div>
 
-        {/* Mobile left: search icon */}
-        <button className="mobile-search-btn ib" onClick={()=>setMobileSearch(s=>!s)} style={{background:"none",border:"none",color:T.text,display:"none",padding:6,flexShrink:0}}>
-          <I.search/>
-        </button>
-
-        {/* Mobile center: wordmark absolutely centered */}
-        <div className="mobile-only" style={{position:"absolute",left:0,right:0,display:"flex",justifyContent:"center",alignItems:"center",pointerEvents:"none",zIndex:1}}>
-          <div style={{fontFamily:"'Sora',sans-serif",fontSize:"0.95rem",fontWeight:700,letterSpacing:"-0.02em",color:T.text,lineHeight:1}}>secretspace</div>
-        </div>
-
-        {/* Desktop right controls */}
-        <div style={{display:"flex",alignItems:"center",gap:6,marginLeft:"auto"}} className="desktop-only">
+        {/* ── Desktop: right controls ── */}
+        <div className="desktop-only" style={{display:"flex",alignItems:"center",gap:6,marginLeft:"auto"}}>
           <button onClick={()=>setDark(d=>!d)} className="ib" style={{background:T.surface2,border:`1px solid ${T.border}`,borderRadius:8,width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",color:T.text}}>
             {dark?<I.sun/>:<I.moon/>}
           </button>
-          {user ? (
+          {user?(
             <button onClick={()=>setModal("account")} style={{display:"flex",alignItems:"center",gap:7,background:T.surface2,border:`1px solid ${T.border}`,borderRadius:8,padding:"0 12px",height:32,fontSize:"0.78rem",fontWeight:500,color:T.text}}>
-              <div style={{width:6,height:6,borderRadius:"50%",background:T.online,flexShrink:0}}/>
-              {user.name.split("_")[0]}
+              <div style={{width:6,height:6,borderRadius:"50%",background:T.online,flexShrink:0}}/>{user.name.split("_")[0]}
             </button>
-          ) : (
+          ):(
             <div style={{display:"flex",gap:6}}>
               <button onClick={()=>setModal("signin")} style={{background:T.accent,border:"none",borderRadius:8,padding:"0 14px",height:32,fontSize:"0.78rem",fontWeight:600,color:T.accentText}}>Sign in</button>
               <button onClick={()=>setModal("signup")} style={{background:T.accent,border:"none",borderRadius:8,padding:"0 14px",height:32,fontSize:"0.78rem",fontWeight:600,color:T.accentText}}>Join free</button>
@@ -251,27 +230,41 @@ export default function App() {
           )}
         </div>
 
-        {/* Mobile right: theme toggle */}
-        <div className="mobile-only" style={{alignItems:"center",marginLeft:"auto",flexShrink:0}}>
-          <button onClick={()=>setDark(d=>!d)} className="ib" style={{background:T.surface2,border:`1px solid ${T.border}`,borderRadius:8,width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",color:T.text}}>
+        {/* ── Mobile: search icon (left) ── */}
+        <button className="mobile-search-btn ib" onClick={()=>setMobileSearch(s=>!s)}
+          style={{background:"none",border:"none",color:T.text,display:"none",padding:6,flexShrink:0}}>
+          <I.search/>
+        </button>
+
+        {/* ── Mobile: wordmark (center, flex-based, no absolute) ── */}
+        <div className="mobile-only" style={{flex:1,display:"flex",justifyContent:"center",alignItems:"center",pointerEvents:"none"}}>
+          <span style={{fontFamily:"'Sora',sans-serif",fontSize:"0.95rem",fontWeight:700,letterSpacing:"-0.02em",color:T.text}}>secretspace</span>
+        </div>
+
+        {/* ── Mobile: theme toggle (right) ── */}
+        <div className="mobile-only" style={{alignItems:"center",flexShrink:0}}>
+          <button onClick={()=>setDark(d=>!d)} className="ib"
+            style={{background:T.surface2,border:`1px solid ${T.border}`,borderRadius:8,width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",color:T.text}}>
             {dark?<I.sun/>:<I.moon/>}
           </button>
         </div>
       </header>
 
       {/* Mobile search bar expandable */}
-      {mobileSearch && (
-        <div className="sd mobile-only" style={{background:T.bg,borderBottom:`1px solid ${T.border}`,padding:"8px 14px",alignItems:"center",gap:8,zIndex:49,width:"100%"}}>
+      {mobileSearch&&(
+        <div className="sd mobile-only" style={{background:T.bg,borderBottom:`1px solid ${T.border}`,padding:"8px 14px",alignItems:"center",gap:8,width:"100%"}}>
           <div style={{flex:1,position:"relative",display:"flex",alignItems:"center"}}>
             <div style={{position:"absolute",left:11,color:T.sub,display:"flex",pointerEvents:"none"}}><I.search/></div>
-            <input autoFocus value={searchVal} onChange={e=>setSearchVal(e.target.value)} placeholder="Search anything..." style={{width:"100%",background:T.surface2,border:`1.5px solid ${T.border2}`,borderRadius:99,padding:"9px 14px 9px 34px",fontSize:"0.85rem",color:T.text}}/>
+            <input autoFocus value={searchVal} onChange={e=>setSearchVal(e.target.value)} placeholder="Search anything..."
+              style={{width:"100%",background:T.surface2,border:`1.5px solid ${T.border2}`,borderRadius:99,padding:"9px 14px 9px 34px",fontSize:"0.85rem",color:T.text}}/>
           </div>
-          <button onClick={()=>{setMobileSearch(false);setSearchVal("");}} style={{background:"none",border:"none",color:T.sub,fontSize:"0.78rem",fontWeight:500,flexShrink:0,padding:"4px 2px"}}>Cancel</button>
+          <button onClick={()=>{setMobileSearch(false);setSearchVal("");}}
+            style={{background:"none",border:"none",color:T.sub,fontSize:"0.78rem",fontWeight:500,flexShrink:0,padding:"4px 0"}}>Cancel</button>
         </div>
       )}
 
       {/* ── Body ── */}
-      <div style={{display:"flex",flex:1,position:"relative"}}>
+      <div style={{display:"flex",flex:1,position:"relative",minWidth:0,overflow:"hidden"}}>
 
         {/* Desktop Left Sidebar — fixed, always visible */}
         <aside className="desktop-sidebar" style={{width:220,borderRight:`1px solid ${T.border}`,background:T.sidebar,flexDirection:"column",flexShrink:0,overflow:"hidden",height:"calc(100vh - 56px)",position:"fixed",top:56,left:0,zIndex:40}}>
@@ -303,7 +296,7 @@ export default function App() {
         </aside>
 
         {/* Center — offset by sidebar widths so it doesn't go under fixed panels */}
-        <main className="desktop-main-margins" style={{flex:1,display:"flex",WebkitOverflowScrolling:"touch"}}>
+        <main className="desktop-main-margins" style={{flex:1,minWidth:0,display:"flex",WebkitOverflowScrolling:"touch"}}>
           <div className="main-pad" style={{flex:1,width:"100%",boxSizing:"border-box"}}>
             {tab==="feed"    && <FeedView    T={T} posts={posts} toggleHeart={toggleHeart} setModal={setModal} user={user} guestId={guestId}/>}
             {tab==="rooms"   && <RoomsView   T={T} rooms={rooms} msgs={msgs} sendMsg={sendMsg} user={user} guestId={guestId} setModal={setModal} activeRoom={activeRoom} setActiveRoom={setActiveRoom}/>}
@@ -320,17 +313,21 @@ export default function App() {
       </div>
 
       {/* ── Mobile Bottom Nav ── */}
-      <nav className="mobile-nav" style={{position:"fixed",bottom:0,left:0,right:0,zIndex:50,background:T.bg,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",borderTop:`1px solid ${T.border}`,justifyContent:"space-around",alignItems:"center",padding:`8px 0 calc(8px + env(safe-area-inset-bottom))`,flexShrink:0,minHeight:56}}>
+      <nav className="mobile-nav" style={{position:"fixed",bottom:0,left:0,right:0,zIndex:50,background:T.bg,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",borderTop:`1px solid ${T.border}`,justifyContent:"space-around",alignItems:"center",padding:`8px 0 calc(8px + env(safe-area-inset-bottom))`,flexShrink:0}}>
         {NAV_ITEMS.map(({id,label,Icon})=>(
-          <button key={id} onClick={()=>setTab(id)} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4,background:"none",border:"none",color:tab===id?T.text:T.sub,padding:"4px 16px",borderRadius:10,minWidth:56,flex:1,maxWidth:90}}>
+          <button key={id} onClick={()=>setTab(id)} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4,background:"none",border:"none",color:tab===id?T.text:T.sub,padding:"4px 0",flex:1,maxWidth:90,borderRadius:10}}>
             <Icon active={tab===id}/>
             <span style={{fontSize:"0.58rem",fontWeight:tab===id?600:400,letterSpacing:"0.02em"}}>{label}</span>
           </button>
         ))}
       </nav>
 
-      {/* Mobile FAB */}
-      <button className="mobile-fab" onClick={()=>setModal("confess")} style={{position:"fixed",bottom:"calc(70px + env(safe-area-inset-bottom))",right:18,zIndex:49,background:T.accent,border:"none",borderRadius:16,width:50,height:50,alignItems:"center",justifyContent:"center",color:T.accentText,boxShadow:`0 4px 24px rgba(0,0,0,${dark?0.55:0.2})`}}>
+      {/* Mobile FAB — new confession */}
+      <button className="mobile-fab" onClick={()=>setModal("confess")}
+        style={{position:"fixed",bottom:`calc(72px + env(safe-area-inset-bottom))`,right:18,zIndex:49,
+          background:T.accent,border:"none",borderRadius:16,width:50,height:50,
+          alignItems:"center",justifyContent:"center",color:T.accentText,
+          boxShadow:`0 4px 24px rgba(0,0,0,${dark?0.55:0.2})`}}>
         <I.plus/>
       </button>
 
@@ -371,10 +368,10 @@ function FeedView({T,posts,toggleHeart,setModal,user,guestId}) {
   const [cat,setCat] = useState("All");
   const filtered = cat==="All"?posts:posts.filter(p=>p.cat===cat);
   return (
-    <div>
-      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
-        <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:"1.45rem",fontWeight:600,color:T.text}}>Confessions</h2>
-        <button onClick={()=>setModal("confess")} style={{display:"flex",alignItems:"center",gap:5,background:T.accent,border:"none",borderRadius:8,padding:"6px 14px",fontSize:"0.78rem",fontWeight:600,color:T.accentText}}>
+    <div style={{width:"100%",minWidth:0}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16,gap:8}}>
+        <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:"1.45rem",fontWeight:600,color:T.text,flexShrink:0}}>Confessions</h2>
+        <button onClick={()=>setModal("confess")} style={{display:"flex",alignItems:"center",gap:5,background:T.accent,border:"none",borderRadius:8,padding:"6px 14px",fontSize:"0.78rem",fontWeight:600,color:T.accentText,flexShrink:0,whiteSpace:"nowrap"}}>
           <I.plus/> Confess
         </button>
       </div>
@@ -398,18 +395,18 @@ function FeedView({T,posts,toggleHeart,setModal,user,guestId}) {
       {/* Posts */}
       <div style={{display:"flex",flexDirection:"column",gap:8}}>
         {filtered.map((p,i)=>(
-          <div key={p.id} className="card" style={{background:T.surface,border:`1px solid ${T.border}`,borderRadius:10,padding:"14px",animationDelay:`${i*0.04}s`}}>
-            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:9}}>
-              <div style={{display:"flex",alignItems:"center",gap:7}}>
+          <div key={p.id} className="card" style={{background:T.surface,border:`1px solid ${T.border}`,borderRadius:10,padding:"14px",animationDelay:`${i*0.04}s`,minWidth:0,overflow:"hidden"}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:9,minWidth:0}}>
+              <div style={{display:"flex",alignItems:"center",gap:7,minWidth:0,flex:1,overflow:"hidden"}}>
                 <div style={{width:24,height:24,borderRadius:"50%",background:T.surface2,border:`1px solid ${T.border}`,display:"flex",alignItems:"center",justifyContent:"center",color:T.sub,fontSize:"0.58rem",fontWeight:700,flexShrink:0}}>{p.author.slice(0,2).toUpperCase()}</div>
-                <span style={{fontSize:"0.74rem",fontWeight:500,color:T.sub}}>{p.author}</span>
+                <span style={{fontSize:"0.74rem",fontWeight:500,color:T.sub,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.author}</span>
               </div>
-              <div style={{display:"flex",alignItems:"center",gap:6}}>
-                <span style={{fontSize:"0.65rem",background:T.tag,color:T.tagText,padding:"2px 7px",borderRadius:4,border:`1px solid ${T.border}`}}>{p.cat}</span>
-                <span style={{fontSize:"0.65rem",color:T.muted}}>{ago(p.ts)}</span>
+              <div style={{display:"flex",alignItems:"center",gap:6,flexShrink:0,marginLeft:8}}>
+                <span style={{fontSize:"0.65rem",background:T.tag,color:T.tagText,padding:"2px 7px",borderRadius:4,border:`1px solid ${T.border}`,whiteSpace:"nowrap"}}>{p.cat}</span>
+                <span style={{fontSize:"0.65rem",color:T.muted,whiteSpace:"nowrap"}}>{ago(p.ts)}</span>
               </div>
             </div>
-            <p style={{fontSize:"0.9rem",lineHeight:1.68,color:T.text,marginBottom:11}}>{p.text}</p>
+            <p style={{fontSize:"0.9rem",lineHeight:1.68,color:T.text,marginBottom:11,textAlign:"left",wordBreak:"break-word"}}>{p.text}</p>
             <div style={{display:"flex",gap:14,alignItems:"center",paddingTop:9,borderTop:`1px solid ${T.border}`}}>
               <button onClick={()=>toggleHeart(p.id)} style={{display:"flex",alignItems:"center",gap:5,background:"none",border:"none",color:p.liked?T.red:T.sub,fontSize:"0.77rem",fontWeight:500,padding:0,transition:"color 0.15s"}}>
                 <I.heart filled={p.liked}/> {p.hearts}
@@ -435,7 +432,7 @@ function RoomsView({T,rooms,msgs,sendMsg,user,guestId,setModal,activeRoom,setAct
     const roomMsgs = msgs[activeRoom.id]||[];
     const me = user?.name||guestId;
     return (
-      <div style={{display:"flex",flexDirection:"column",height:"calc(100dvh - 130px)"}}>
+      <div style={{display:"flex",flexDirection:"column",height:"calc(100dvh - 120px)"}}>
         <div style={{display:"flex",alignItems:"center",gap:10,paddingBottom:12,marginBottom:12,borderBottom:`1px solid ${T.border}`,flexShrink:0}}>
           <button onClick={()=>setActiveRoom(null)} className="ib" style={{background:T.surface2,border:`1px solid ${T.border}`,borderRadius:7,width:30,height:30,display:"flex",alignItems:"center",justifyContent:"center",color:T.sub,flexShrink:0}}>
             <I.back/>
