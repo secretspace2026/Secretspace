@@ -1,7 +1,6 @@
-import { useState, useRef, useEffect } from "react";
-import { supabase } from "./supabaseClient";
+﻿import { useState, useRef, useEffect } from "react";
 
-// ─── SVG Icons ────────────────────────────────────────────────────────────
+// â”€â”€â”€ SVG Icons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const I = {
   // New logo: overlapping S lettermark with orbit ring
   logo: () => (
@@ -29,13 +28,14 @@ const I = {
   eyeOff:    () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>,
   chevR:     () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>,
   trending:  () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>,
+  goldCheck: () => <span title="SecretSpace Premium" style={{width:15,height:15,borderRadius:"50%",background:"linear-gradient(135deg,#f7d046,#b7791f)",color:"#241300",display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:"0.62rem",fontWeight:900,lineHeight:1,boxShadow:"0 0 0 1px rgba(247,208,70,0.5)"}}>âœ“</span>,
   settings:  () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
   search:    () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
   back:      () => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>,
   menu:      () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const ADJS  = ["Cosmic","Stellar","Nebula","Velvet","Shadow","Lunar","Mystic","Astral","Nova","Cipher","Photon","Quasar"];
 const NOUNS = ["Wanderer","Phantom","Observer","Pilgrim","Nomad","Specter","Drifter","Watcher","Echo","Signal","Voyager","Pulse"];
 const uid   = () => Math.random().toString(36).slice(2,9);
@@ -44,7 +44,7 @@ const ago   = ts => { const s=Math.floor((Date.now()-ts)/1000); if(s<60)return`$
 
 const CATS = ["All","Life","Work","Hobby","Film","Love","Other"];
 
-// ─── Seed Data ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Seed Data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const SEED_POSTS = [
   {id:uid(),author:"Cosmic_Wanderer_4829",text:"I still sleep with a stuffed animal and I'm 27. Zero regrets.",cat:"Life",hearts:142,liked:false,ts:Date.now()-3600000,comments:3},
   {id:uid(),author:"Shadow_Echo_7231",text:"I pretend to be busy on video calls so people think I'm important. Works every time.",cat:"Work",hearts:89,liked:false,ts:Date.now()-7200000,comments:1},
@@ -79,7 +79,7 @@ const SEED_FRIENDS = [
   {id:4,name:"Velvet_Watcher_2204", status:"away",   mutual:2,req:false},
 ];
 
-// ─── Themes ───────────────────────────────────────────────────────────────
+// â”€â”€â”€ Themes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const DARK = {
   bg:"#080808", sidebar:"#0d0d0d", surface:"#111111", surface2:"#181818", surface3:"#1e1e1e",
   border:"#1e1e1e", border2:"#2a2a2a", text:"#efefef", sub:"#666", muted:"#2e2e2e",
@@ -97,7 +97,7 @@ const LIGHT = {
   tag:"#eeeeec", tagText:"#777", red:"#dc2626", searchBg:"#e8e4df", searchBorder:"#d8d3ce",
 };
 
-// ─── Global CSS ───────────────────────────────────────────────────────────
+// â”€â”€â”€ Global CSS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function globalCss(T, dark) {
   return `
     @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,400&display=swap');
@@ -118,6 +118,7 @@ function globalCss(T, dark) {
     .pb:hover{opacity:0.75;}
     .rr:hover{background:${T.surface2} !important;border-color:${T.border2} !important;}
     .fr:hover{background:${T.surface2} !important;}
+    .privacy-lock{user-select:none;-webkit-user-select:none;}
     @keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
     .card{animation:fadeUp 0.22s ease forwards;opacity:0;}
     @keyframes mIn{from{opacity:0;transform:scale(0.98) translateY(4px)}to{opacity:1;transform:scale(1) translateY(0)}}
@@ -125,11 +126,11 @@ function globalCss(T, dark) {
     @keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
     .sd{animation:slideDown 0.2s ease forwards;}
 
-    /* ── Mobile bottom sheet ── */
+    /* â”€â”€ Mobile bottom sheet â”€â”€ */
     @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
     .sheet{animation:sheetUp 0.28s cubic-bezier(0.34,1.1,0.64,1) forwards;}
 
-    /* ── Responsive layout ── */
+    /* â”€â”€ Responsive layout â”€â”€ */
     .desktop-only{display:none !important;}
     .mobile-only{display:flex !important;}
     .mobile-nav{display:flex !important;}
@@ -164,7 +165,7 @@ function globalCss(T, dark) {
   `;
 }
 
-// ─── App ──────────────────────────────────────────────────────────────────
+// â”€â”€â”€ App â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export default function App() {
   const [dark,setDark]             = useState(true);
   const [tab,setTab]               = useState("feed");
@@ -177,14 +178,30 @@ export default function App() {
   const [activeRoom,setActiveRoom] = useState(null);
   const [mobileSearch,setMobileSearch] = useState(false);
   const [searchVal,setSearchVal]   = useState("");
+  const [privacyScreen,setPrivacyScreen] = useState(false);
   const T = dark ? DARK : LIGHT;
 
   const toggleHeart = id => setPosts(p=>p.map(c=>c.id===id?{...c,hearts:c.hearts+(c.liked?-1:1),liked:!c.liked}:c));
   const addPost     = (text,cat)=>{ setPosts(p=>[{id:uid(),author:user?.name||guestId,text,cat,hearts:0,liked:false,ts:Date.now(),comments:0},...p]); setModal(null); };
   const addRoom     = (r)=>{ setRooms(p=>[r,...p]); setMsgs(m=>({...m,[r.id]:[]})); setModal(null); };
   const sendMsg     = (roomId,text)=>setMsgs(p=>({...p,[roomId]:[...(p[roomId]||[]),{id:uid(),from:user?.name||guestId,text,ts:Date.now()}]}));
-  const signUp      = (name)=>{ setUser({name,id:genId(),joined:Date.now()}); setModal(null); };
-  const signIn      = (name)=>{ setUser({name,id:genId(),joined:Date.now()}); setModal(null); };
+  const signUp      = (name)=>{ setUser({name,id:genId(),joined:Date.now(),subscribed:false}); setModal(null); };
+  const signIn      = (name)=>{ setUser({name,id:genId(),joined:Date.now(),subscribed:false}); setModal(null); };
+  const upgradeUser = ()=>setUser(u=>u?{...u,subscribed:true}:u);
+
+  useEffect(()=>{
+    const hide = () => setPrivacyScreen(true);
+    const show = () => setPrivacyScreen(false);
+    const onVisibility = () => setPrivacyScreen(document.hidden);
+    window.addEventListener("blur",hide);
+    window.addEventListener("focus",show);
+    document.addEventListener("visibilitychange",onVisibility);
+    return ()=>{
+      window.removeEventListener("blur",hide);
+      window.removeEventListener("focus",show);
+      document.removeEventListener("visibilitychange",onVisibility);
+    };
+  },[]);
 
   const NAV_ITEMS = [
     {id:"feed",    label:"Confessions", Icon:I.feed   },
@@ -194,19 +211,27 @@ export default function App() {
   ];
 
   return (
-    <div style={{display:"flex",flexDirection:"column",minHeight:"100vh",width:"100%",maxWidth:"100vw",overflowX:"hidden",background:T.bg,color:T.text,fontFamily:"'Sora',sans-serif"}}>
+    <div className="privacy-lock" onContextMenu={e=>e.preventDefault()} style={{display:"flex",flexDirection:"column",minHeight:"100vh",width:"100%",maxWidth:"100vw",overflowX:"hidden",background:T.bg,color:T.text,fontFamily:"'Sora',sans-serif"}}>
       <style>{globalCss(T,dark)}</style>
+      {privacyScreen&&(
+        <div style={{position:"fixed",inset:0,zIndex:9999,background:T.bg,color:T.text,display:"flex",alignItems:"center",justifyContent:"center",textAlign:"center",padding:24}}>
+          <div>
+            <div style={{fontSize:"1rem",fontWeight:700,marginBottom:6}}>SecretSpace is protected</div>
+            <div style={{fontSize:"0.82rem",color:T.sub,lineHeight:1.5}}>Content is hidden while the app is out of focus.</div>
+          </div>
+        </div>
+      )}
 
-      {/* ── Header ── */}
+      {/* â”€â”€ Header â”€â”€ */}
       <header className="header-h" style={{position:"sticky",top:0,zIndex:50,borderBottom:`1px solid ${T.border}`,background:T.bg,backdropFilter:"blur(18px)",WebkitBackdropFilter:"blur(18px)",display:"flex",alignItems:"center",padding:"0 14px",gap:8,flexShrink:0,width:"100%",maxWidth:"100vw",overflow:"hidden"}}>
 
-        {/* ── Desktop: wordmark left ── */}
+        {/* â”€â”€ Desktop: wordmark left â”€â”€ */}
         <div className="desktop-only" style={{display:"flex",alignItems:"center",gap:9,flexShrink:0}}>
           <div style={{fontFamily:"'Sora',sans-serif",fontSize:"0.92rem",fontWeight:700,letterSpacing:"-0.02em",color:T.text,lineHeight:1}}>secretspace</div>
           <div style={{fontSize:"0.48rem",letterSpacing:"0.18em",textTransform:"uppercase",color:T.sub,marginTop:2,display:"block"}}>anonymous network</div>
         </div>
 
-        {/* ── Desktop: search bar centered ── */}
+        {/* â”€â”€ Desktop: search bar centered â”€â”€ */}
         <div className="desktop-search" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",width:380,display:"flex",alignItems:"center"}}>
           <div style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",color:T.sub,display:"flex",pointerEvents:"none"}}><I.search/></div>
           <input value={searchVal} onChange={e=>setSearchVal(e.target.value)} placeholder="Search anything..."
@@ -214,7 +239,7 @@ export default function App() {
           {searchVal&&<button onClick={()=>setSearchVal("")} className="ib" style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:T.sub,display:"flex",padding:2}}><I.close/></button>}
         </div>
 
-        {/* ── Desktop: right controls ── */}
+        {/* â”€â”€ Desktop: right controls â”€â”€ */}
         <div className="desktop-only" style={{display:"flex",alignItems:"center",gap:6,marginLeft:"auto"}}>
           <button onClick={()=>setDark(d=>!d)} className="ib" style={{background:T.surface2,border:`1px solid ${T.border}`,borderRadius:8,width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",color:T.text}}>
             {dark?<I.sun/>:<I.moon/>}
@@ -231,18 +256,18 @@ export default function App() {
           )}
         </div>
 
-        {/* ── Mobile: search icon (left) ── */}
+        {/* â”€â”€ Mobile: search icon (left) â”€â”€ */}
         <button className="mobile-search-btn ib" onClick={()=>setMobileSearch(s=>!s)}
           style={{background:"none",border:"none",color:T.text,display:"none",padding:6,flexShrink:0}}>
           <I.search/>
         </button>
 
-        {/* ── Mobile: wordmark (center, flex-based, no absolute) ── */}
+        {/* â”€â”€ Mobile: wordmark (center, flex-based, no absolute) â”€â”€ */}
         <div className="mobile-only" style={{flex:1,display:"flex",justifyContent:"center",alignItems:"center",pointerEvents:"none"}}>
           <span style={{fontFamily:"'Sora',sans-serif",fontSize:"0.95rem",fontWeight:700,letterSpacing:"-0.02em",color:T.text}}>secretspace</span>
         </div>
 
-        {/* ── Mobile: theme toggle (right) ── */}
+        {/* â”€â”€ Mobile: theme toggle (right) â”€â”€ */}
         <div className="mobile-only" style={{alignItems:"center",flexShrink:0}}>
           <button onClick={()=>setDark(d=>!d)} className="ib"
             style={{background:T.surface2,border:`1px solid ${T.border}`,borderRadius:8,width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",color:T.text}}>
@@ -264,10 +289,10 @@ export default function App() {
         </div>
       )}
 
-      {/* ── Body ── */}
+      {/* â”€â”€ Body â”€â”€ */}
       <div style={{display:"flex",flex:1,position:"relative",minWidth:0,overflow:"hidden"}}>
 
-        {/* Desktop Left Sidebar — fixed, always visible */}
+        {/* Desktop Left Sidebar â€” fixed, always visible */}
         <aside className="desktop-sidebar" style={{width:220,borderRight:`1px solid ${T.border}`,background:T.sidebar,flexDirection:"column",flexShrink:0,overflow:"hidden",height:"calc(100vh - 56px)",position:"fixed",top:56,left:0,zIndex:40}}>
           <nav style={{padding:"12px 8px",display:"flex",flexDirection:"column",gap:1}}>
             {NAV_ITEMS.map(({id,label,Icon})=>(
@@ -289,31 +314,31 @@ export default function App() {
             ))}
           </div>
 
-          <div style={{marginTop:"auto",padding:"10px 8px",borderTop:`1px solid ${T.border}`}}>
+          {tab==="feed"&&<div style={{marginTop:"auto",padding:"10px 8px",borderTop:`1px solid ${T.border}`}}>
             <button onClick={()=>setModal("confess")} style={{width:"100%",background:T.accent,border:"none",borderRadius:8,padding:"9px 0",fontSize:"0.8rem",fontWeight:600,color:T.accentText,display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
               <I.plus/> New Confession
             </button>
-          </div>
+          </div>}
         </aside>
 
-        {/* Center — offset by sidebar widths so it doesn't go under fixed panels */}
+        {/* Center â€” offset by sidebar widths so it doesn't go under fixed panels */}
         <main className="desktop-main-margins" style={{flex:1,minWidth:0,display:"flex",WebkitOverflowScrolling:"touch"}}>
           <div className="main-pad" style={{flex:1,width:"100%",boxSizing:"border-box"}}>
             {tab==="feed"    && <FeedView    T={T} posts={posts} toggleHeart={toggleHeart} setModal={setModal} user={user} guestId={guestId}/>}
             {tab==="rooms"   && <RoomsView   T={T} rooms={rooms} msgs={msgs} sendMsg={sendMsg} user={user} guestId={guestId} setModal={setModal} activeRoom={activeRoom} setActiveRoom={setActiveRoom}/>}
-            {tab==="account" && <AccountView T={T} user={user} guestId={guestId} setModal={setModal}/>}
+            {tab==="account" && <AccountView T={T} user={user} guestId={guestId} setModal={setModal} onUpgrade={upgradeUser}/>}
             {tab==="friends" && <FriendsView T={T}/>}
           </div>
         </main>
 
-        {/* Desktop Right Panel — fixed, always visible */}
+        {/* Desktop Right Panel â€” fixed, always visible */}
         <aside className="desktop-right" style={{width:240,borderLeft:`1px solid ${T.border}`,padding:"20px 14px",flexDirection:"column",gap:16,flexShrink:0,overflowY:"auto",height:"calc(100vh - 56px)",position:"fixed",top:56,right:0,zIndex:40,background:T.sidebar}}>
           <RightStats T={T} posts={posts} rooms={rooms}/>
           <TrendingPanel T={T} posts={posts} toggleHeart={toggleHeart}/>
         </aside>
       </div>
 
-      {/* ── Mobile Bottom Nav ── */}
+      {/* â”€â”€ Mobile Bottom Nav â”€â”€ */}
       <nav className="mobile-nav" style={{position:"fixed",bottom:0,left:0,right:0,zIndex:50,background:T.bg,backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",borderTop:`1px solid ${T.border}`,justifyContent:"space-around",alignItems:"center",padding:`8px 0 calc(8px + env(safe-area-inset-bottom))`,flexShrink:0}}>
         {NAV_ITEMS.map(({id,label,Icon})=>(
           <button key={id} onClick={()=>setTab(id)} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4,background:"none",border:"none",color:tab===id?T.text:T.sub,padding:"4px 0",flex:1,maxWidth:90,borderRadius:10}}>
@@ -323,16 +348,16 @@ export default function App() {
         ))}
       </nav>
 
-      {/* Mobile FAB — new confession */}
-      <button className="mobile-fab" onClick={()=>setModal("confess")}
+      {/* Mobile FAB â€” new confession */}
+      {tab==="feed"&&<button className="mobile-fab" onClick={()=>setModal("confess")}
         style={{position:"fixed",bottom:`calc(72px + env(safe-area-inset-bottom))`,right:18,zIndex:49,
           background:T.accent,border:"none",borderRadius:16,width:50,height:50,
           alignItems:"center",justifyContent:"center",color:T.accentText,
           boxShadow:`0 4px 24px rgba(0,0,0,${dark?0.55:0.2})`}}>
         <I.plus/>
-      </button>
+      </button>}
 
-      {/* ── Modals ── */}
+      {/* â”€â”€ Modals â”€â”€ */}
       {modal && (
         <>
           {/* Desktop: centered modal */}
@@ -354,7 +379,7 @@ export default function App() {
   );
 }
 
-// ─── Modal Router ─────────────────────────────────────────────────────────
+// â”€â”€â”€ Modal Router â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function ModalContent({modal,T,setModal,user,guestId,addPost,addRoom,signUp,signIn,onSignOut}) {
   if(modal==="confess")  return <ConfessModal  T={T} onSubmit={addPost} onClose={()=>setModal(null)} user={user} guestId={guestId}/>;
   if(modal==="signup")   return <SignUpModal   T={T} onSubmit={signUp}  onClose={()=>setModal(null)} setModal={setModal}/>;
@@ -364,7 +389,7 @@ function ModalContent({modal,T,setModal,user,guestId,addPost,addRoom,signUp,sign
   return null;
 }
 
-// ─── Feed View ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Feed View â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function FeedView({T,posts,toggleHeart,setModal,user,guestId}) {
   const [cat,setCat] = useState("All");
   const filtered = cat==="All"?posts:posts.filter(p=>p.cat===cat);
@@ -372,7 +397,7 @@ function FeedView({T,posts,toggleHeart,setModal,user,guestId}) {
     <div style={{width:"100%",minWidth:0}}>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16,gap:8}}>
         <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:"1.45rem",fontWeight:600,color:T.text,flexShrink:0}}>Confessions</h2>
-        <button onClick={()=>setModal("confess")} style={{display:"flex",alignItems:"center",gap:5,background:T.accent,border:"none",borderRadius:8,padding:"6px 14px",fontSize:"0.78rem",fontWeight:600,color:T.accentText,flexShrink:0,whiteSpace:"nowrap"}}>
+        <button className="desktop-only" onClick={()=>setModal("confess")} style={{display:"flex",alignItems:"center",gap:5,background:T.accent,border:"none",borderRadius:8,padding:"6px 14px",fontSize:"0.78rem",fontWeight:600,color:T.accentText,flexShrink:0,whiteSpace:"nowrap"}}>
           <I.plus/> Confess
         </button>
       </div>
@@ -423,10 +448,11 @@ function FeedView({T,posts,toggleHeart,setModal,user,guestId}) {
   );
 }
 
-// ─── Rooms View ───────────────────────────────────────────────────────────
+// â”€â”€â”€ Rooms View â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function RoomsView({T,rooms,msgs,sendMsg,user,guestId,setModal,activeRoom,setActiveRoom}) {
   const [msg,setMsg] = useState("");
   const bottomRef    = useRef(null);
+  const canCreateRoom = !!user?.subscribed;
   useEffect(()=>{ bottomRef.current?.scrollIntoView({behavior:"smooth"}); },[msgs,activeRoom]);
 
   if(activeRoom) {
@@ -477,8 +503,8 @@ function RoomsView({T,rooms,msgs,sendMsg,user,guestId,setModal,activeRoom,setAct
     <div>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
         <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:"1.45rem",fontWeight:600,color:T.text}}>Rooms</h2>
-        <button onClick={()=>setModal("newroom")} style={{display:"flex",alignItems:"center",gap:5,background:T.accent,border:"none",borderRadius:8,padding:"6px 14px",fontSize:"0.78rem",fontWeight:600,color:T.accentText}}>
-          <I.plus/> Create Room
+        <button onClick={()=>canCreateRoom&&setModal("newroom")} disabled={!canCreateRoom} title={canCreateRoom?"Create a room":"Upgrade to create rooms"} style={{display:"flex",alignItems:"center",gap:5,background:canCreateRoom?T.accent:T.surface2,border:canCreateRoom?"none":`1px solid ${T.border}`,borderRadius:8,padding:"6px 14px",fontSize:"0.78rem",fontWeight:600,color:canCreateRoom?T.accentText:T.sub,opacity:canCreateRoom?1:0.72,cursor:canCreateRoom?"pointer":"not-allowed"}}>
+          {canCreateRoom?"Create Room":"Premium Only"}
         </button>
       </div>
       <div style={{display:"flex",flexDirection:"column",gap:7}}>
@@ -506,51 +532,113 @@ function RoomsView({T,rooms,msgs,sendMsg,user,guestId,setModal,activeRoom,setAct
   );
 }
 
-// ─── Account View ─────────────────────────────────────────────────────────
-function AccountView({T,user,guestId,setModal}) {
+// â”€â”€â”€ Account View â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function AccountView({T,user,guestId,setModal,onUpgrade}) {
+  const isPremium = !!user?.subscribed;
   return (
     <div>
       <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:"1.45rem",fontWeight:600,color:T.text,marginBottom:16}}>Account</h2>
       <div style={{background:T.surface,border:`1px solid ${T.border}`,borderRadius:12,padding:18,marginBottom:10,display:"flex",alignItems:"center",gap:14}}>
         <div style={{width:50,height:50,borderRadius:"50%",background:T.surface2,border:`1px solid ${T.border}`,display:"flex",alignItems:"center",justifyContent:"center",color:T.sub,fontSize:"0.95rem",fontWeight:700,flexShrink:0}}>{(user?.name||guestId).slice(0,2).toUpperCase()}</div>
         <div style={{flex:1,minWidth:0}}>
-          <div style={{fontWeight:600,fontSize:"0.93rem",color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{user?.name||guestId}</div>
-          <div style={{fontSize:"0.72rem",color:T.sub,marginTop:3,display:"flex",alignItems:"center",gap:5}}><I.shield/> {user?"Member · Anonymous":"Guest · Anonymous"}</div>
+          <div style={{fontWeight:600,fontSize:"0.93rem",color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:6}}>
+            <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{user?.name||guestId}</span>{isPremium&&<I.goldCheck/>}
+          </div>
+          <div style={{fontSize:"0.72rem",color:T.sub,marginTop:3,display:"flex",alignItems:"center",gap:5}}><I.shield/> {user?(isPremium?"Premium Member - Anonymous":"Member - Anonymous"):"Guest - Anonymous"}</div>
         </div>
         {user&&<button onClick={()=>setModal("account")} style={{background:T.surface2,border:`1px solid ${T.border}`,borderRadius:7,width:30,height:30,display:"flex",alignItems:"center",justifyContent:"center",color:T.sub,flexShrink:0}}><I.settings/></button>}
       </div>
       <div style={{background:T.surface,border:`1px solid ${T.border}`,borderRadius:12,overflow:"hidden",marginBottom:12}}>
-        {[{label:"Privacy mode",val:"Anonymous by default"},{label:"Data stored",val:"Nothing identifiable"},{label:"Network",val:"Global · Decentralised"}].map((row,i)=>(
-          <div key={row.label} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"11px 14px",borderBottom:i<2?`1px solid ${T.border}`:"none"}}>
+        {[{label:"Privacy mode",val:"Anonymous by default"},{label:"End-to-end encryption",val:"Frontend ready"},{label:"Screen privacy",val:"Deterrents active"},{label:"Network",val:"Global - Decentralised"}].map((row,i)=>(
+          <div key={row.label} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"11px 14px",borderBottom:i<3?`1px solid ${T.border}`:"none"}}>
             <span style={{fontSize:"0.82rem",color:T.sub}}>{row.label}</span>
             <span style={{fontSize:"0.8rem",fontWeight:500,color:T.text}}>{row.val}</span>
           </div>
         ))}
       </div>
       {!user&&(
-        <div style={{display:"flex",gap:8}}>
+        <div style={{display:"flex",gap:8,marginBottom:12}}>
           <button onClick={()=>setModal("signup")} style={{flex:1,background:T.accent,border:"none",borderRadius:9,padding:"11px 0",fontSize:"0.86rem",fontWeight:600,color:T.accentText}}>Create Virtual Account</button>
           <button onClick={()=>setModal("signin")} style={{flex:1,background:T.surface2,border:`1px solid ${T.border}`,borderRadius:9,padding:"11px 0",fontSize:"0.86rem",fontWeight:500,color:T.text}}>Sign In</button>
         </div>
       )}
+      <div style={{background:T.surface,border:`1px solid ${isPremium?"#d6a620":T.border}`,borderRadius:12,padding:16,boxShadow:isPremium?"0 0 0 1px rgba(214,166,32,0.18)":"none"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,marginBottom:9}}>
+          <div>
+            <div style={{display:"flex",alignItems:"center",gap:7,fontSize:"0.94rem",fontWeight:700,color:T.text}}>Upgrade <I.goldCheck/></div>
+            <div style={{fontSize:"0.72rem",color:T.sub,marginTop:3}}>SecretSpace Premium</div>
+          </div>
+          <div style={{fontSize:"1rem",fontWeight:800,color:"#d6a620"}}>49/month</div>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:6,margin:"10px 0 14px"}}>
+          {["Golden tickmark on your account name","Only premium accounts can create rooms","Confessions get priority and up to 2x views","More premium features ready for Razorpay"].map(x=>(
+            <div key={x} style={{fontSize:"0.76rem",color:T.sub,display:"flex",alignItems:"center",gap:7}}><span style={{color:"#d6a620",fontWeight:900}}>•</span>{x}</div>
+          ))}
+        </div>
+        <button onClick={user?onUpgrade:()=>setModal("signup")} disabled={isPremium} style={{width:"100%",background:isPremium?T.surface2:"#d6a620",border:isPremium?`1px solid ${T.border}`:"none",borderRadius:9,padding:"10px 0",fontSize:"0.84rem",fontWeight:700,color:isPremium?T.sub:"#1b1200",cursor:isPremium?"default":"pointer"}}>
+          {isPremium?"Premium Active":"Upgrade with Razorpay"}
+        </button>
+      </div>
     </div>
   );
 }
-
-// ─── Friends View ─────────────────────────────────────────────────────────
 function FriendsView({T}) {
   const [friends,setFriends] = useState(SEED_FRIENDS);
   const [search,setSearch]   = useState("");
   const [addVal,setAddVal]   = useState("");
+  const [activeFriend,setActiveFriend] = useState(null);
+  const [draft,setDraft] = useState("");
+  const [friendMsgs,setFriendMsgs] = useState(()=>Object.fromEntries(SEED_FRIENDS.map(f=>[f.id,[{id:uid(),from:f.name,text:"Hey, you can message me here now.",ts:Date.now()-300000}]])));
   const filtered = friends.filter(f=>f.name.toLowerCase().includes(search.toLowerCase()));
 
   function addFriend() {
     if(!addVal.trim()) return;
-    setFriends(f=>[...f,{id:Date.now(),name:addVal.trim(),status:"offline",mutual:0,req:false}]);
+    const friend={id:Date.now(),name:addVal.trim(),status:"offline",mutual:0,req:false};
+    setFriends(f=>[...f,friend]);
+    setFriendMsgs(m=>({...m,[friend.id]:[]}));
     setAddVal("");
   }
 
+  function sendFriendMsg() {
+    if(!activeFriend||!draft.trim()) return;
+    setFriendMsgs(m=>({...m,[activeFriend.id]:[...(m[activeFriend.id]||[]),{id:uid(),from:"me",text:draft.trim(),ts:Date.now()}]}));
+    setDraft("");
+  }
+
   const statusColor = s => s==="online"?T.online:s==="away"?T.away:T.muted;
+
+  if(activeFriend) {
+    const msgs = friendMsgs[activeFriend.id]||[];
+    return (
+      <div style={{display:"flex",flexDirection:"column",height:"calc(100dvh - 120px)"}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,paddingBottom:12,marginBottom:12,borderBottom:`1px solid ${T.border}`,flexShrink:0}}>
+          <button onClick={()=>setActiveFriend(null)} className="ib" style={{background:T.surface2,border:`1px solid ${T.border}`,borderRadius:7,width:30,height:30,display:"flex",alignItems:"center",justifyContent:"center",color:T.sub,flexShrink:0}}><I.back/></button>
+          <div style={{position:"relative",flexShrink:0}}>
+            <div style={{width:34,height:34,borderRadius:"50%",background:T.surface2,border:`1px solid ${T.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"0.62rem",fontWeight:700,color:T.sub}}>{activeFriend.name.slice(0,2).toUpperCase()}</div>
+            <div style={{position:"absolute",bottom:0,right:0,width:9,height:9,borderRadius:"50%",border:`2px solid ${T.surface}`,background:statusColor(activeFriend.status)}}/>
+          </div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontWeight:600,fontSize:"0.92rem",color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{activeFriend.name}</div>
+            <div style={{fontSize:"0.7rem",color:T.sub,marginTop:1}}>Private message - {activeFriend.status}</div>
+          </div>
+        </div>
+        <div style={{flex:1,overflowY:"auto",display:"flex",flexDirection:"column",gap:10}}>
+          {msgs.map(m=>{
+            const isMe=m.from==="me";
+            return (
+              <div key={m.id} style={{display:"flex",justifyContent:isMe?"flex-end":"flex-start"}}>
+                <div style={{maxWidth:"76%",background:isMe?T.accent:T.surface2,color:isMe?T.accentText:T.text,padding:"8px 12px",borderRadius:isMe?"10px 10px 2px 10px":"10px 10px 10px 2px",fontSize:"0.86rem",lineHeight:1.55,border:`1px solid ${T.border}`}}>{m.text}</div>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{display:"flex",gap:8,marginTop:12,paddingTop:12,borderTop:`1px solid ${T.border}`,flexShrink:0}}>
+          <input value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")sendFriendMsg();}} placeholder={`Message ${activeFriend.name}...`} style={{flex:1,background:T.input,border:`1px solid ${T.border}`,borderRadius:99,padding:"9px 16px",fontSize:"0.85rem",color:T.text}}/>
+          <button onClick={sendFriendMsg} style={{width:38,height:38,background:T.accent,border:"none",borderRadius:10,color:T.accentText,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><I.send/></button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -559,7 +647,6 @@ function FriendsView({T}) {
         <span style={{fontSize:"0.75rem",color:T.sub}}>{friends.filter(f=>f.status==="online").length} online</span>
       </div>
 
-      {/* Friend requests */}
       {friends.filter(f=>f.req).length>0&&(
         <div style={{background:T.surface,border:`1px solid ${T.border}`,borderRadius:10,padding:"12px 14px",marginBottom:12}}>
           <div style={{fontSize:"0.68rem",color:T.sub,letterSpacing:"0.08em",textTransform:"uppercase",fontWeight:600,marginBottom:8}}>Requests</div>
@@ -576,32 +663,28 @@ function FriendsView({T}) {
         </div>
       )}
 
-      {/* Add friend */}
       <div style={{display:"flex",gap:7,marginBottom:10}}>
         <div style={{flex:1,position:"relative",display:"flex",alignItems:"center"}}>
           <div style={{position:"absolute",left:11,color:T.sub,pointerEvents:"none",display:"flex"}}><I.search/></div>
           <input value={addVal} onChange={e=>setAddVal(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addFriend()} placeholder="Add by Virtual ID..." style={{width:"100%",background:T.input,border:`1px solid ${T.border}`,borderRadius:99,padding:"8px 14px 8px 34px",fontSize:"0.82rem",color:T.text}}/>
         </div>
-        <button onClick={addFriend} style={{background:T.accent,border:"none",borderRadius:10,width:36,height:36,display:"flex",alignItems:"center",justifyContent:"center",color:T.accentText,flexShrink:0}}>
-          <I.plus/>
-        </button>
+        <button onClick={addFriend} style={{background:T.accent,border:"none",borderRadius:10,width:46,height:36,display:"flex",alignItems:"center",justifyContent:"center",color:T.accentText,flexShrink:0,fontSize:"0.72rem",fontWeight:700}}>Add</button>
       </div>
 
-      {/* Search existing */}
       <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search friends..." style={{width:"100%",background:T.input,border:`1px solid ${T.border}`,borderRadius:99,padding:"8px 16px",fontSize:"0.82rem",color:T.text,marginBottom:10,boxSizing:"border-box"}}/>
 
       <div style={{display:"flex",flexDirection:"column",gap:6}}>
         {filtered.map(f=>(
-          <div key={f.id} className="fr" style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:T.surface,border:`1px solid ${T.border}`,borderRadius:10,cursor:"pointer",transition:"background 0.15s"}}>
+          <div key={f.id} className="fr" style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:T.surface,border:`1px solid ${T.border}`,borderRadius:10,transition:"background 0.15s"}}>
             <div style={{position:"relative",flexShrink:0}}>
               <div style={{width:34,height:34,borderRadius:"50%",background:T.surface2,border:`1px solid ${T.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"0.62rem",fontWeight:700,color:T.sub}}>{f.name.slice(0,2).toUpperCase()}</div>
               <div style={{position:"absolute",bottom:0,right:0,width:9,height:9,borderRadius:"50%",border:`2px solid ${T.surface}`,background:statusColor(f.status)}}/>
             </div>
             <div style={{flex:1,minWidth:0}}>
               <div style={{fontWeight:500,fontSize:"0.84rem",color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{f.name}</div>
-              <div style={{fontSize:"0.68rem",color:T.sub,marginTop:1}}>{f.mutual} mutual · {f.status}</div>
+              <div style={{fontSize:"0.68rem",color:T.sub,marginTop:1}}>{f.mutual} mutual - {f.status}</div>
             </div>
-            <button style={{background:T.surface2,border:`1px solid ${T.border}`,borderRadius:7,padding:"5px 12px",fontSize:"0.7rem",fontWeight:500,color:T.sub,flexShrink:0}}>Message</button>
+            <button onClick={()=>setActiveFriend(f)} style={{background:T.surface2,border:`1px solid ${T.border}`,borderRadius:7,padding:"5px 12px",fontSize:"0.7rem",fontWeight:500,color:T.text,flexShrink:0}}>Message</button>
           </div>
         ))}
         {filtered.length===0&&<p style={{textAlign:"center",color:T.muted,fontSize:"0.8rem",padding:"24px 0"}}>No friends found</p>}
@@ -609,8 +692,7 @@ function FriendsView({T}) {
     </div>
   );
 }
-
-// ─── Right Panels ─────────────────────────────────────────────────────────
+// â”€â”€â”€ Right Panels â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function RightStats({T,posts,rooms}) {
   return (
     <div style={{background:T.surface,border:`1px solid ${T.border}`,borderRadius:10,padding:"14px"}}>
@@ -648,7 +730,7 @@ function TrendingPanel({T,posts,toggleHeart}) {
   );
 }
 
-// ─── Modals ───────────────────────────────────────────────────────────────
+// â”€â”€â”€ Modals â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function MH({T,title,onClose}) {
   return (
     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:18}}>
@@ -714,41 +796,15 @@ function NewRoomModal({T,onSubmit,onClose}) {
 }
 
 function SignUpModal({T,onSubmit,onClose,setModal}) {
-  const [name,setName]=useState("");
-  const [pass,setPass]=useState("");
-  const [show,setShow]=useState(false);
-  const [loading,setLoading]=useState(false);
-  const [error,setError]=useState("");
+  const [name,setName]=useState(""); const [pass,setPass]=useState(""); const [show,setShow]=useState(false);
   const suggested=useState(genId)[0];
-
-  const handleSignUp = async () => {
-    if(!pass) return;
-    setLoading(true);
-    setError("");
-    const username = name.trim() || suggested;
-    const fakeEmail = `${username.toLowerCase()}@secretspace.app`;
-    const { data, error: signUpError } = await supabase.auth.signUp({
-      email: fakeEmail,
-      password: pass,
-    });
-    if(signUpError){ setError(signUpError.message); setLoading(false); return; }
-    const { error: profileError } = await supabase.from("profiles").insert({
-      id: data.user.id,
-      username: username,
-    });
-    if(profileError){ setError("Username taken, try another."); setLoading(false); return; }
-    onSubmit(username);
-    setLoading(false);
-  };
-
   return <>
     <MH T={T} title="Create Account" onClose={onClose}/>
     <div style={{background:T.surface2,border:`1px solid ${T.border}`,borderRadius:8,padding:"10px 13px",marginBottom:12}}>
       <div style={{fontSize:"0.6rem",color:T.muted,marginBottom:2,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:600}}>Your Virtual ID</div>
       <div style={{fontWeight:600,fontSize:"0.86rem",color:T.text}}>{suggested}</div>
-      <div style={{fontSize:"0.68rem",color:T.sub,marginTop:2}}>Auto-generated · Anonymous · No real name needed</div>
+      <div style={{fontSize:"0.68rem",color:T.sub,marginTop:2}}>Auto-generated Â· Anonymous Â· No real name needed</div>
     </div>
-    {error && <div style={{background:"#fee",border:"1px solid #fcc",borderRadius:8,padding:"8px 12px",marginBottom:10,fontSize:"0.78rem",color:"#c00"}}>{error}</div>}
     <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:14}}>
       <input value={name} onChange={e=>setName(e.target.value)} placeholder={`Username (default: ${suggested.split("_")[0]})`} style={inp(T)}/>
       <div style={{position:"relative"}}>
@@ -756,40 +812,21 @@ function SignUpModal({T,onSubmit,onClose,setModal}) {
         <button onClick={()=>setShow(s=>!s)} style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:T.sub,display:"flex",padding:2}}>{show?<I.eyeOff/>:<I.eye/>}</button>
       </div>
     </div>
-    <PBtn T={T} label={loading?"Creating...":"Create Virtual Account"} onClick={handleSignUp} disabled={!pass||loading}/>
-    <p style={{textAlign:"center",fontSize:"0.68rem",color:T.muted,marginTop:8}}>No email required · Fully anonymous</p>
+    <PBtn T={T} label="Create Virtual Account" onClick={()=>(name.trim()||suggested)&&pass&&onSubmit(name.trim()||suggested)} disabled={!pass}/>
+    <p style={{textAlign:"center",fontSize:"0.68rem",color:T.muted,marginTop:8}}>No email required Â· Fully anonymous</p>
     <p style={{textAlign:"center",fontSize:"0.76rem",color:T.sub,marginTop:6}}>Already have an account? <button onClick={()=>setModal("signin")} style={{background:"none",border:"none",color:T.text,fontWeight:600,cursor:"pointer",textDecoration:"underline",fontSize:"inherit"}}>Sign in</button></p>
   </>;
 }
 
 function SignInModal({T,onSubmit,onClose,setModal}) {
-  const [name,setName]=useState("");
-  const [pass,setPass]=useState("");
-  const [loading,setLoading]=useState(false);
-  const [error,setError]=useState("");
-
-  const handleSignIn = async () => {
-    if(!name.trim()||!pass) return;
-    setLoading(true);
-    setError("");
-    const fakeEmail = `${name.trim().toLowerCase()}@secretspace.app`;
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: fakeEmail,
-      password: pass,
-    });
-    if(signInError){ setError("Wrong username or password."); setLoading(false); return; }
-    onSubmit(name.trim());
-    setLoading(false);
-  };
-
+  const [name,setName]=useState(""); const [pass,setPass]=useState("");
   return <>
     <MH T={T} title="Sign In" onClose={onClose}/>
-    {error && <div style={{background:"#fee",border:"1px solid #fcc",borderRadius:8,padding:"8px 12px",marginBottom:10,fontSize:"0.78rem",color:"#c00"}}>{error}</div>}
     <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:14}}>
       <input value={name} onChange={e=>setName(e.target.value)} placeholder="Your username or Virtual ID" style={inp(T)}/>
       <input value={pass} onChange={e=>setPass(e.target.value)} type="password" placeholder="Password" style={inp(T)}/>
     </div>
-    <PBtn T={T} label={loading?"Signing in...":"Sign In"} onClick={handleSignIn} disabled={!name.trim()||!pass||loading}/>
+    <PBtn T={T} label="Sign In" onClick={()=>name.trim()&&onSubmit(name.trim())} disabled={!name.trim()}/>
     <p style={{textAlign:"center",fontSize:"0.76rem",color:T.sub,marginTop:10}}>No account? <button onClick={()=>setModal("signup")} style={{background:"none",border:"none",color:T.text,fontWeight:600,cursor:"pointer",textDecoration:"underline",fontSize:"inherit"}}>Create one free</button></p>
   </>;
 }
@@ -801,9 +838,12 @@ function AccountModal({T,user,onClose,onSignOut}) {
       <div style={{width:42,height:42,borderRadius:"50%",background:T.surface,border:`1px solid ${T.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"0.82rem",fontWeight:700,color:T.sub,flexShrink:0}}>{user?.name.slice(0,2).toUpperCase()}</div>
       <div>
         <div style={{fontWeight:600,fontSize:"0.88rem",color:T.text}}>{user?.name}</div>
-        <div style={{fontSize:"0.7rem",color:T.sub,marginTop:2,display:"flex",alignItems:"center",gap:4}}><I.shield/> Virtual Account · Anonymous</div>
+        <div style={{fontSize:"0.7rem",color:T.sub,marginTop:2,display:"flex",alignItems:"center",gap:4}}><I.shield/> Virtual Account Â· Anonymous</div>
       </div>
     </div>
     <button onClick={onSignOut} style={{width:"100%",background:T.surface2,border:`1px solid ${T.border}`,borderRadius:8,padding:"10px 0",fontSize:"0.86rem",fontWeight:500,color:T.red,cursor:"pointer"}}>Sign Out</button>
   </>;
 }
+
+
+
